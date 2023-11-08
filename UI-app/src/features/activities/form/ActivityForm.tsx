@@ -1,20 +1,18 @@
 import { Button, Form, Segment } from "semantic-ui-react";
-import { Activity } from "../../../app/Models/Activity";
+
 import { ChangeEvent, useState } from "react";
+import { useStore } from "../../../app/stores/store";
+import { observer } from "mobx-react-lite";
 
-interface Props {
-  handleCloseForm: () => void;
-  activity: Activity | undefined;
-  handleCreateOrEditActivity: (activity: Activity) => void;
-  submitting: boolean;
-}
-
-const ActivityForm = ({
-  handleCloseForm,
-  activity: selectedActivity,
-  handleCreateOrEditActivity,
-  submitting,
-}: Props) => {
+const ActivityForm = () => {
+  const { activityStore } = useStore();
+  const {
+    selectedActivity,
+    handleCloseForm,
+    createActivity,
+    updateActivity,
+    loading,
+  } = activityStore;
   const initialState = selectedActivity ?? {
     id: "",
     title: "",
@@ -27,7 +25,7 @@ const ActivityForm = ({
   const [activity, setActivity] = useState(initialState);
 
   const handleSubmit = () => {
-    handleCreateOrEditActivity(activity);
+    activity.id ? updateActivity(activity) : createActivity(activity);
   };
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -79,7 +77,7 @@ const ActivityForm = ({
           positive
           type="submit"
           content="Submit"
-          loading={submitting}
+          loading={loading}
         />
         <Button
           floated="right"
@@ -92,4 +90,4 @@ const ActivityForm = ({
   );
 };
 
-export default ActivityForm;
+export default observer(ActivityForm);
